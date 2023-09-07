@@ -44,6 +44,12 @@ public class TreeNode<Key extends Comparable<Key>,Val extends NodeValue<Key>> {
     public void setColor(ColorEnum color) {
         this.color = color;
     }
+    public void setBlack(){
+        this.color = ColorEnum.BLACK;
+    }
+    public void setRed(){
+        this.color = ColorEnum.RED;
+    }
 
     public Val getVal() {
         return val;
@@ -87,6 +93,11 @@ public class TreeNode<Key extends Comparable<Key>,Val extends NodeValue<Key>> {
             case RIGHT: return parent.getLeft();
             default: return null;
         }
-
+    }
+    public boolean isRed(){
+        return color == ColorEnum.RED;
+    }
+    public boolean isBlack(){
+        return color == ColorEnum.BLACK;
     }
 }

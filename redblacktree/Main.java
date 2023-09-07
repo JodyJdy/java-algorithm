@@ -6,23 +6,20 @@
  */
 public class Main {
     public static void main(String[] args) {
-        RedBlackTree<String ,Person> tree = new RedBlackTree<>();
-
-        tree.insert(new Person("1"));
-        tree.insert(new Person("2"));
-        tree.insert(new Person("3"));
-        tree.insert(new Person("4"));
-        tree.insert(new Person("5"));
-        tree.insert(new Person("6"));
-        for (int i = 7; i < 100; i++) {
-            tree.insert(new Person(i+""));
+        test();
+    }
+    public static void test(){
+        RedBlackTree<Integer ,Person> tree = new RedBlackTree<>();
+        for (int i = 1; i <= 10000; i++) {
+            tree.insert(new Person(i));
         }
-
-
-        System.out.println(tree.search("1"));
-        System.out.println(tree.search("2"));
-
-
+        for (int i = 5001; i <= 10000; i++) {
+            tree.delete(i);
+        }
+        for (int i = 1; i <= 5000; i++) {
+            System.out.println(tree.search(i));
+        }
+        System.out.println(tree.search(9999));
 
     }
     public static <K extends Comparable<K>,V extends NodeValue<K>> void  show(TreeNode<K,V>node){
@@ -33,17 +30,28 @@ public class Main {
         show(node.getLeft());
         show(node.getRight());
     }
+    public static int a = 0;
+    public static <K extends Comparable<K>,V extends NodeValue<K>> void  checkRight(TreeNode<K,V>node){
+        if (node == null) {
+            return;
+        }
+        if (node.getLeft() != null) {
+            checkRight(node.getLeft());
+        }
+        System.out.println(node.getVal());
+        checkRight(node.getRight());
+    }
 
 
 
-    public static class Person  implements NodeValue<String>{
+    public static class Person  implements NodeValue<Integer>{
         @Override
-        public String  getKey() {
+        public Integer  getKey() {
             return key;
         }
-        String key;
+        Integer key;
 
-        public Person(String key) {
+        public Person(Integer key) {
             this.key = key;
         }
 
