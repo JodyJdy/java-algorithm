@@ -332,6 +332,7 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
                 rootNode.setType(NodeType.ROOT_LEAF);
                 return;
             }
+            //父节点不平衡，进行处理，父节点一定是索引节点
             if (!node.getParentNode().equals(rootNode) && isEmpty(node.getParentNode())) {
                 doIndexNodeDelete(node.getParentNode());
                 return;
@@ -360,6 +361,7 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
                 rootNode.setType(NodeType.ROOT_LEAF);
                 return;
             }
+            //父节点不平衡，进行处理，父节点一定是索引节点
             if (!node.getParentNode().equals(rootNode) && isEmpty(node.getParentNode())) {
                 doIndexNodeDelete(node.getParentNode());
                 return;
