@@ -56,9 +56,9 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
                 if (lt(k, keyList.get(i))) {
                     from = indexNode.getSubNodes().get(i);
                     break;
-                } else if(eq(k,keyList.get(i))&& i + 1 < indexNode.getSubNodes().size()){
-                   from = indexNode.getSubNodes().get(i+1) ;
-                   break;
+                } else if (eq(k, keyList.get(i)) && i + 1 < indexNode.getSubNodes().size()) {
+                    from = indexNode.getSubNodes().get(i + 1);
+                    break;
                 }
             }
             //未找到，那就是最后一个
@@ -70,7 +70,7 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
     }
 
     /**
-     *如果key 相同的val已经存在，会进行替换
+     * 如果key 相同的val已经存在，会进行替换
      */
     public void insert(Val val) {
         //插入根节点
@@ -85,9 +85,9 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
         //根据key找到指定的位置
         Key k = val.getKey();
         TreeLeafNode<Key, Val> insertedNode = searchNode(k);
-        int index =insertedNode.getKeys().indexOf(val.getKey());
+        int index = insertedNode.getKeys().indexOf(val.getKey());
         //如果key相同，进行替换，这样就不会有重复的key出现
-        if(index >= 0){
+        if (index >= 0) {
             insertedNode.getValues().set(index, val);
             return;
         }
@@ -149,7 +149,6 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
             split(parentNode);
         }
     }
-
 
 
     private void splitLeafNode(TreeLeafNode<Key, Val> leafNode) {
@@ -243,7 +242,7 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
 
 
     /**
-      节点是否是满的
+     * 节点是否是满的
      */
     public boolean isFull(TreeNode<Key, Val> t) {
         return t.getKeys().size() >= m;
@@ -251,21 +250,21 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
 
 
     /**
-     *节点是否不平衡
+     * 节点是否不平衡
      */
     public boolean isEmpty(TreeNode<Key, Val> t) {
-        return !(t.getKeys().size() > (m-1) /2 - 1);
+        return !(t.getKeys().size() > (m - 1) / 2 - 1);
     }
 
     /**
      * 节点是否富裕
      */
     public boolean isRich(TreeNode<Key, Val> t) {
-        return t.getKeys().size() > m/2;
+        return t.getKeys().size() > m / 2;
     }
 
     public void delete(Key key) {
-        TreeLeafNode<Key,Val> node = searchNode(key);
+        TreeLeafNode<Key, Val> node = searchNode(key);
         if (node == null) {
             throw new RuntimeException("key不存在:" + key);
         }
@@ -273,7 +272,7 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
     }
 
     /**
-     *叶子节点删除
+     * 叶子节点删除
      */
     private void doLeafNodeDelete(TreeLeafNode<Key, Val> node, Key key) {
         //删除节点
@@ -294,42 +293,38 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
         //获取当前节点在父节点中的顺序
         int nodeIndex = node.getParentNode().getSubNodeIndex(node);
         //左兄弟有富裕，借一个key
-        if (node.getLeftSiblings() != null) {
-            TreeLeafNode<Key,Val> leftSiblings = node.getLeftSiblings();
-            if(isRich(leftSiblings)){
-                Key lastKey = leftSiblings.removeLastKey();
-                node.getKeys().add(0,lastKey);
-                node.getValues().add(0,leftSiblings.removeLastVal());
-                //调整key 为 借的兄弟节点的key
-                //左兄弟的最后一个key（借的哪一个）替换为父节点上面的key
-                node.getParentNode().getKeys().set(nodeIndex - 1, lastKey);
-                return;
-            }
+        if (node.getLeftSiblings() != null && isRich(node.getLeftSiblings())) {
+            TreeLeafNode<Key, Val> leftSiblings = node.getLeftSiblings();
+            Key lastKey = leftSiblings.removeLastKey();
+            node.getKeys().add(0, lastKey);
+            node.getValues().add(0, leftSiblings.removeLastVal());
+            //左兄弟的最后一个key（借的key）替换为父节点上面的key
+            node.getParentNode().getKeys().set(nodeIndex - 1, lastKey);
+            return;
         }
         //右兄弟有富裕，借一个key
-        if (node.getRightSiblings() != null) {
-            TreeLeafNode<Key,Val> rightSiblings = node.getRightSiblings();
-            if (isRich(rightSiblings)) {
-                Key firstKey = rightSiblings.removeFirstKey();;
-                node.getKeys().add(firstKey);
-                node.getValues().add(rightSiblings.removeFirstVal());
-                //右兄弟的第一个key（借过之后的第一个）替换为父节点上面的key
-                node.getParentNode().getKeys().set(nodeIndex, firstKey);
-                return;
-            }
+        if (node.getRightSiblings() != null && isRich(node.getRightSiblings())) {
+            TreeLeafNode<Key, Val> rightSiblings = node.getRightSiblings();
+            Key firstKey = rightSiblings.removeFirstKey();
+            node.getKeys().add(firstKey);
+            node.getValues().add(rightSiblings.removeFirstVal());
+            //右兄弟的第一个key(借的那个key)替换为父节点上面的key
+            node.getParentNode().getKeys().set(nodeIndex, firstKey);
+            return;
         }
-        //无富裕，尝试合并
+        //左右兄弟都无富裕，尝试合并
+
         if (node.getLeftSiblings() != null) {
-            TreeLeafNode<Key,Val> leftSiblings = node.getLeftSiblings();
-                //合并到leftSiblings里面
-                //从父节点中删除node
-                node.getParentNode().getSubNodes().remove(node);
-                leftSiblings.getKeys().addAll(node.getKeys());
-                leftSiblings.getValues().addAll(node.getValues());
-                //设置 链表右节点
-                leftSiblings.setRightNode(node.getRightNode());
-                //删除父节点中多余的key
-                node.getParentNode().getKeys().remove(nodeIndex - 1);
+            TreeLeafNode<Key, Val> leftSiblings = node.getLeftSiblings();
+            //合并到leftSiblings里面
+            //从父节点中删除node
+            node.getParentNode().getSubNodes().remove(node);
+            leftSiblings.getKeys().addAll(node.getKeys());
+            leftSiblings.getValues().addAll(node.getValues());
+            //设置 链表右节点
+            leftSiblings.setRightNode(node.getRightNode());
+            //删除父节点中多余的key
+            node.getParentNode().getKeys().remove(nodeIndex - 1);
             //需要调整root节点
             if (node.getParentNode().equals(rootNode) && node.getParentNode().emptyKeys()) {
                 leftSiblings.setParentNode(null);
@@ -345,14 +340,14 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
         }
         if (node.getRightSiblings() != null) {
             //合并到rightSiblings里面
-            TreeLeafNode<Key,Val> rightSiblings = node.getRightSiblings();
+            TreeLeafNode<Key, Val> rightSiblings = node.getRightSiblings();
             node.getParentNode().getSubNodes().remove(node);
             // node的内容插入到 rightSiblings的头部；
             for (int x = node.getKeys().size() - 1; x >= 0; x--) {
-                rightSiblings.getKeys().add(0,node.getKey(x));
+                rightSiblings.getKeys().add(0, node.getKey(x));
             }
             for (int x = node.getValues().size() - 1; x >= 0; x--) {
-                rightSiblings.getValues().add(0,node.getVal(x));
+                rightSiblings.getValues().add(0, node.getVal(x));
             }
             //设置左节点
             rightSiblings.setLeftNode(node.getLeftNode());
@@ -372,49 +367,49 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
             return;
         }
     }
+
     private void doIndexNodeDelete(TreeIndexNode<Key, Val> node) {
         int nodeIndex = node.getParentNode().getSubNodeIndex(node);
-        if (node.getLeftSiblings() != null) {
-            TreeIndexNode<Key,Val> leftSiblings = node.getLeftSiblings();
-            if (isRich(leftSiblings)) {
-                Key t = node.getParentNode().getKey(nodeIndex - 1);
-                Key t2 = leftSiblings.removeLastKey();
-                //兄弟节点key上移动
-                node.getParentNode().getKeys().set(nodeIndex - 1, t2);
-                //父节点key下一移动，移动到当前节点的开始位置
-                node.getKeys().add(0,t);
-                TreeNode<Key,Val> n = leftSiblings.removeLastSubNode();
-                n.setParentNode(node);
-                node.getSubNodes().add(0,n);
-                return;
-            }
+        //左节点是否富裕
+        if (node.getLeftSiblings() != null && isRich(node.getLeftSiblings())) {
+            TreeIndexNode<Key, Val> leftSiblings = node.getLeftSiblings();
+            Key t = node.getParentNode().getKey(nodeIndex - 1);
+            Key t2 = leftSiblings.removeLastKey();
+            //兄弟节点key上移动
+            node.getParentNode().getKeys().set(nodeIndex - 1, t2);
+            //父节点key下一移动，移动到当前节点的开始位置
+            node.getKeys().add(0, t);
+            TreeNode<Key, Val> n = leftSiblings.removeLastSubNode();
+            n.setParentNode(node);
+            node.getSubNodes().add(0, n);
+            return;
         }
-        if (node.getRightSiblings() != null) {
-            TreeIndexNode<Key,Val> rightSiblings = node.getRightSiblings();
-            if (isRich(rightSiblings)) {
-                Key t = node.getParentNode().getKey(nodeIndex);
-                Key t2 = rightSiblings.removeFirstKey();
-                //兄弟节点key上移动
-                node.getParentNode().getKeys().set(nodeIndex, t2);
-                //父节点key下移动，移动到当前节点的尾部
-                node.getKeys().add(t);
-                // 右兄弟节点的第一个子节点也移动过来
-                TreeNode<Key,Val> n =rightSiblings.removeFirstSubNode();
-                n.setParentNode(node);
-                node.getSubNodes().add(n);
-                return;
-            }
+        //右节点是否富裕
+        if (node.getRightSiblings() != null && isRich(node.getRightSiblings())) {
+            TreeIndexNode<Key, Val> rightSiblings = node.getRightSiblings();
+            Key t = node.getParentNode().getKey(nodeIndex);
+            Key t2 = rightSiblings.removeFirstKey();
+            //兄弟节点key上移动
+            node.getParentNode().getKeys().set(nodeIndex, t2);
+            //父节点key下移动，移动到当前节点的尾部
+            node.getKeys().add(t);
+            // 右兄弟节点的第一个子节点也移动过来
+            TreeNode<Key, Val> n = rightSiblings.removeFirstSubNode();
+            n.setParentNode(node);
+            node.getSubNodes().add(n);
+            return;
         }
+        //都不富裕，进行合并
         if (node.getLeftSiblings() != null) {
-           //合并
-            TreeIndexNode<Key,Val> leftSiblings = node.getLeftSiblings();
+            //合并
+            TreeIndexNode<Key, Val> leftSiblings = node.getLeftSiblings();
             //删除父节点中的key
             Key t = node.getParentNode().removeKey(nodeIndex - 1);
             leftSiblings.getKeys().add(t);
             leftSiblings.getKeys().addAll(node.getKeys());
             leftSiblings.getSubNodes().addAll(node.getSubNodes());
             //合并后要设置父亲节点
-            leftSiblings.getSubNodes().forEach(s->s.setParentNode(leftSiblings));
+            leftSiblings.getSubNodes().forEach(s -> s.setParentNode(leftSiblings));
             //删除node节点，合并成 leftSibling了
             node.getParentNode().getSubNodes().remove(node);
             //root情况特殊处理
@@ -425,20 +420,20 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
                 return;
             }
             //如果父节点不平衡，处理父节点
-            if(!node.getParentNode().equals(rootNode)  && isEmpty(leftSiblings.getParentNode())){
+            if (!node.getParentNode().equals(rootNode) && isEmpty(leftSiblings.getParentNode())) {
                 doIndexNodeDelete(leftSiblings.getParentNode());
                 return;
             }
         }
-        if (node.getRightSiblings() != null){
-           //合并
-            TreeIndexNode<Key,Val> rightSiblings = node.getRightSiblings();
+        if (node.getRightSiblings() != null) {
+            //合并
+            TreeIndexNode<Key, Val> rightSiblings = node.getRightSiblings();
             Key t = node.getParentNode().getKeys().remove(nodeIndex);
             node.getKeys().add(t);
             node.getKeys().addAll(rightSiblings.getKeys());
             node.getSubNodes().addAll(rightSiblings.getSubNodes());
             //合并后要设置父亲节点
-            node.getSubNodes().forEach(s->s.setParentNode(node));
+            node.getSubNodes().forEach(s -> s.setParentNode(node));
             node.getParentNode().getSubNodes().remove(rightSiblings);
             if (node.getParentNode().equals(rootNode) && rootNode.emptyKeys()) {
                 rootNode = node;
@@ -447,10 +442,9 @@ public class BPlusTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> 
                 return;
             }
             //如果父节点不平衡，处理父节点；根节点允许不平衡
-            if(!node.getParentNode().equals(rootNode) && isEmpty(node.getParentNode())){
+            if (!node.getParentNode().equals(rootNode) && isEmpty(node.getParentNode())) {
                 doIndexNodeDelete(node.getParentNode());
             }
-
         }
     }
 }
