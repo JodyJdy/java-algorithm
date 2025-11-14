@@ -1,7 +1,9 @@
+package bplustree;
+
 import java.util.Iterator;
 import java.util.List;
 
-import static utl.CompareUtil.*;
+import static bplustree.utl.CompareUtil.*;
 
 /**
  * @author jdy

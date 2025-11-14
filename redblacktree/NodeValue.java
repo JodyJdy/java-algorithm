@@ -1,3 +1,5 @@
+package redblacktree;
+
 /**
  * 使用 Val 表示节点值，K来表示 节点排序字段
  * @author jdy

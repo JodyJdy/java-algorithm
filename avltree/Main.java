@@ -1,6 +1,8 @@
+
+package avltree;
 /**
  * @author jdy
- * @title: Main
+ * @title: avltree
  * @description:
  * @data 2023/9/8 10:33
  */

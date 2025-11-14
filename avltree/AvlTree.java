@@ -1,14 +1,18 @@
+package avltree;
 /**
  * j
+ *
  * @author jdy
  * @title: AvlTree
  * @description:
  * @data 2023/9/8 9:38
  */
-import static utl.CompareUtil.*;
+
+import static avltree.utl.CompareUtil.*;
+
 public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
 
-    private TreeNode<Key,Val> root;
+    private TreeNode<Key, Val> root;
 
     public void insert(Val v) {
         //第一次插入
@@ -29,24 +33,29 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         newNode.setParent(nodeForInsert);
         if (lt(v.getKey(), nodeForInsert.getKey())) {
             nodeForInsert.setLeft(newNode);
-        } else{
+        } else {
             nodeForInsert.setRight(newNode);
         }
         balance(nodeForInsert);
     }
 
-    public void balance(TreeNode<Key,Val> node){
+    public void balance(TreeNode<Key, Val> node) {
         //可能当前节点是平衡的，但是父节点是不平衡的，因此要迭代到root节点
         while (node != null) {
             BalanceTypeEnum type = testBalance(node);
             switch (type) {
-                case LL : node = rotateRight(node);break;
-                case LR : {
-                    rotateLeft( node.getLeft());
+                case LL:
                     node = rotateRight(node);
-                }break;
-                case RR: node = rotateLeft(node);break;
-                case RL : {
+                    break;
+                case LR: {
+                    rotateLeft(node.getLeft());
+                    node = rotateRight(node);
+                }
+                break;
+                case RR:
+                    node = rotateLeft(node);
+                    break;
+                case RL: {
                     rotateRight(node.getRight());
                     node = rotateLeft(node);
                 }
@@ -66,9 +75,9 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
     }
 
     private TreeNode<Key, Val> searchNodeForInsert(Key key, TreeNode<Key, Val> from) {
-        if(lt(key,from.getKey())){
+        if (lt(key, from.getKey())) {
             if (from.getLeft() != null) {
-                return searchNodeForInsert(key,from.getLeft());
+                return searchNodeForInsert(key, from.getLeft());
             }
         }
         if (ge(key, from.getKey())) {
@@ -78,7 +87,8 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         }
         return from;
     }
-    private TreeNode<Key,Val> search(Key key, TreeNode<Key, Val> from) {
+
+    private TreeNode<Key, Val> search(Key key, TreeNode<Key, Val> from) {
         if (from == null) {
             return null;
         }
@@ -90,6 +100,7 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         }
         return search(key, from.getRight());
     }
+
     public void delete(Key key) {
         TreeNode<Key, Val> node = search(key, root);
         doDeleteNode(node);
@@ -99,31 +110,31 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         if (node == null) {
             return;
         }
-        TreeNode<Key,Val> parent = node.getParent();
+        TreeNode<Key, Val> parent = node.getParent();
         // 删除的是叶子节点
         if (node.getLeft() == null && node.getRight() == null) {
             if (node.equals(root)) {
                 root = null;
                 return;
             }
-            if(node.equals(parent.getLeft())){
+            if (node.equals(parent.getLeft())) {
                 parent.setLeft(null);
-            } else{
+            } else {
                 parent.setRight(null);
             }
             balance(parent);
             return;
         }
         //只有左子树或者只有右子树， 用左子树 或者右字树替代即可
-        if((node.getLeft() == null && node.getRight() != null)||(node.getLeft() != null && node.getRight() == null)){
-            TreeNode<Key,Val> replace = node.getLeft() == null ? node.getRight() : node.getLeft();
+        if ((node.getLeft() == null && node.getRight() != null) || (node.getLeft() != null && node.getRight() == null)) {
+            TreeNode<Key, Val> replace = node.getLeft() == null ? node.getRight() : node.getLeft();
             if (root.equals(node)) {
                 root = replace;
                 return;
             }
-            if(node.equals(parent.getLeft())){
+            if (node.equals(parent.getLeft())) {
                 parent.setLeft(replace);
-            } else{
+            } else {
                 parent.setRight(replace);
             }
             replace.setParent(parent);
@@ -139,7 +150,8 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
             doDeleteNode(leftMax);
         }
     }
-    public TreeNode<Key,Val> findLeftMax(TreeNode<Key,Val> left){
+
+    public TreeNode<Key, Val> findLeftMax(TreeNode<Key, Val> left) {
         while (left.getRight() != null) {
             left = left.getRight();
         }
@@ -154,9 +166,9 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
             throw new RuntimeException("无法旋转");
         }
         //父节点
-        TreeNode<Key,Val> parent = node.getParent();
+        TreeNode<Key, Val> parent = node.getParent();
         //newNode 用于替换 当前node的位置
-        TreeNode<Key,Val> newNode = node.getRight();
+        TreeNode<Key, Val> newNode = node.getRight();
 
         node.setRight(newNode.getLeft());
         if (newNode.getLeft() != null) {
@@ -166,9 +178,9 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         //设置父节点中的子节点为 newNode
         if (node.equals(root)) {
             this.root = newNode;
-        } else if(node.equals(parent.getLeft())){
+        } else if (node.equals(parent.getLeft())) {
             parent.setLeft(newNode);
-        } else{
+        } else {
             parent.setRight(newNode);
         }
         //设置parent
@@ -185,9 +197,9 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
             throw new RuntimeException("无法旋转");
         }
         //父节点
-        TreeNode<Key,Val> parent = node.getParent();
+        TreeNode<Key, Val> parent = node.getParent();
         //newNode 用于替换 当前node的位置
-        TreeNode<Key,Val> newNode = node.getLeft();
+        TreeNode<Key, Val> newNode = node.getLeft();
 
         node.setLeft(newNode.getRight());
         if (newNode.getRight() != null) {
@@ -198,9 +210,9 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         //设置父节点中的子节点为 newNode
         if (node.equals(root)) {
             this.root = newNode;
-        } else if(node.equals(parent.getLeft())){
+        } else if (node.equals(parent.getLeft())) {
             parent.setLeft(newNode);
-        } else{
+        } else {
             parent.setRight(newNode);
         }
         //设置parent
@@ -210,27 +222,27 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
     }
 
     public BalanceTypeEnum testBalance(TreeNode<Key, Val> node) {
-        TreeNode<Key,Val> leftNode = node.getLeft();
-        TreeNode<Key,Val> rightNode = node.getRight();
+        TreeNode<Key, Val> leftNode = node.getLeft();
+        TreeNode<Key, Val> rightNode = node.getRight();
         int left = maxHeight(leftNode);
         int right = maxHeight(rightNode);
         //不平衡，判断不平衡的类型
-        if(Math.abs(left - right) > 1){
+        if (Math.abs(left - right) > 1) {
             // LL 或者 LR
             if (left - right > 1) {
                 if (leftNode.getLeft() != null && maxHeight(leftNode.getLeft()) - right >= 1) {
-                   return BalanceTypeEnum.LL;
+                    return BalanceTypeEnum.LL;
                 } else if (leftNode.getRight() != null && maxHeight(leftNode.getRight()) - right >= 1) {
                     return BalanceTypeEnum.LR;
-                } else{
+                } else {
                     throw new RuntimeException("结构异常或有多处不平衡");
                 }
-            } else{
+            } else {
                 if (rightNode.getRight() != null && maxHeight(rightNode.getRight()) - left >= 1) {
-                   return BalanceTypeEnum.RR;
-                } else if(rightNode.getRight() != null && maxHeight(rightNode.getLeft()) - left >= 1){
+                    return BalanceTypeEnum.RR;
+                } else if (rightNode.getRight() != null && maxHeight(rightNode.getLeft()) - left >= 1) {
                     return BalanceTypeEnum.RL;
-                } else{
+                } else {
                     throw new RuntimeException("结构异常或有多处不平衡");
                 }
             }
@@ -244,7 +256,7 @@ public class AvlTree<Key extends Comparable<Key>, Val extends NodeValue<Key>> {
         }
         int left = maxHeight(node.getLeft());
         int right = maxHeight(node.getRight());
-        return Math.max(left,right) + 1;
+        return Math.max(left, right) + 1;
     }
 
     public TreeNode<Key, Val> getRoot() {

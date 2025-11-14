@@ -1,3 +1,5 @@
+package avltree;
+
 /**
  * @author jdy
  * @title: BalanceTypeEnum

@@ -1,3 +1,5 @@
+package trie;
+
 /**
  *用于从序列中获取第i个元素
  * @param <Array> 数组

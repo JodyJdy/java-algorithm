@@ -1,10 +1,12 @@
+package redblacktree;
+
 /**
  * @author jdy
  * @title: RedBlackTree
  * @description:
  * @data 2023/9/7 16:26
  */
-import static utl.CompareUtil.*;
+import static redblacktree.utl.CompareUtil.*;
 public class RedBlackTree <Key extends Comparable<Key>,Val extends NodeValue<Key>>{
     public TreeNode<Key, Val> getRoot() {
         return root;

@@ -1,6 +1,8 @@
+package bplustree;
+
 /**
  * @author jdy
- * @title: Main
+ * @title: bplustree
  * @description:
  * @data 2023/9/6 10:29
  */
@@ -8,10 +10,10 @@ public class Main {
     public static void main(String[] args) {
 
 
-                BPlusTree<Integer, Person> tree = new BPlusTree<>(33);
-                for (int i = 1; i < 2000; i++) {
-                    tree.insert(new Person(i));
-                }
+        BPlusTree<Integer, Person> tree = new BPlusTree<>(33);
+        for (int i = 1; i < 2000; i++) {
+            tree.insert(new Person(i));
+        }
         for (int i = 1; i < 995; i++) {
             tree.delete(i);
         }
@@ -25,7 +27,7 @@ public class Main {
 
     }
 
-    static class Person implements NodeValue<Integer>{
+    static class Person implements NodeValue<Integer> {
         @Override
         public String toString() {
             return "Person{" +
