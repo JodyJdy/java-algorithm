@@ -16,6 +16,14 @@ public class ConsistentHash<K, V> {
 
 
     public ConsistentHash() {
+
+    }
+
+    public ConsistentHash(int realNode, int replica) {
+        for(int i = 0; i < realNode; i++){
+            String nodeName = "node:"+ConsistentHash.randomString();
+            addRealNode(nodeName,replica);
+        }
     }
 
     public void addRealNode(String nodeName, int replica) {
@@ -78,6 +86,12 @@ public class ConsistentHash<K, V> {
         return !greaterThanHashMap.isEmpty() ? greaterThanHashMap.firstKey() : treeMap.firstKey();
     }
 
+    /**
+     * 获取真实节点名称
+     */
+    public Set<String> getRealNodeNames() {
+        return realNodes.keySet();
+    }
 
     /**
      * 生成虚拟节点对应的key    0#0,0#1
@@ -92,17 +106,16 @@ public class ConsistentHash<K, V> {
 
     static int hashMapHash(Object key) {
         int h;
-        return ((key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16));
+        return (((key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16))) & 0x7fffffff;
     }
 
     private static final String CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final Random RANDOM = new Random();
 
-    public static String randomGenerateChar() {
-        // 随机生成长度 10~100之间
-        int length = 10 + RANDOM.nextInt(91); // nextInt(11) → 0~10
+    public static String randomString() {
+        // 随机生成长度20之间
+        int length = 20;
         StringBuilder sb = new StringBuilder(length);
-
         for (int i = 0; i < length; i++) {
             sb.append(CHAR_POOL.charAt(RANDOM.nextInt(CHAR_POOL.length())));
         }
